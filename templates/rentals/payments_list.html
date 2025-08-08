@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments - RentFlow{% endblock %}
+
+{% block content %}
+<style>
+.search-filter-bar {
+    overflow-x: auto;
+}
+
+.search-filter-bar > div {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 600px;
+    gap: 16px;
+    align-items: center;
+}
+
+</style>
+
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-credit-card"></i>
+        Payments
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'add_payment' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Record Payment
+        </a>
+        <button class="btn btn-secondary">
+            <i class="fas fa-download"></i>
+            Export
+        </button>
+    </div>
+</div>
+
+<div class="search-filter-bar">
+    <div class="d-flex flex-wrap gap-3 align-items-center w-100">
+        <div class="d-flex flex-wrap gap-2" style="flex: 1 1 100%;">
+            <select class="filter-select form-select" onchange="filterPayments(this.value)">
+                <option value="">All Methods</option>
+                <option value="cash">Cash</option>
+                <option value="mpesa">M-Pesa</option>
+                <option value="bank_transfer">Bank Transfer</option>
+                <option value="cheque">Cheque</option>
+            </select>
+            <input type="month" class="filter-select form-control" onchange="filterByMonth(this.value)">
+        </div>
+        <div class="d-flex justify-content-md-end justify-content-start w-100 mt-2 mt-md-0">
+            <div class="d-flex gap-2 align-items-center">
+                <span class="text-muted small">Total this month:</span>
+                <span class="fw-bold text-success fs-5">
+                    KES {% widthratio payments|length 1 25000 %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="table-container">
+  <div class="table-header">
+    <h3 class="table-title">
+      <i class="fas fa-list"></i>
+      All Payments ({{ payments.count }})
+    </h3>
+    <div style="display: flex; gap: 12px;">
+      <select class="filter-select" onchange="sortPayments(this.value)">
+        <option value="-payment_date">Latest First</option>
+        <option value="payment_date">Oldest First</option>
+        <option value="-amount">Highest Amount</option>
+        <option value="amount">Lowest Amount</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div style="overflow-x: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tenant</th>
+          <th>Unit</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Method</th>
+          <th>Reference</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in payments %}
+         <tr data-method="{{ payment.payment_method }}" data-date="{{ payment.payment_date|date:'Y-m' }}">
+                <td> {{ forloop.counter }} </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--success-color), #34d399); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                            {{ payment.tenant.first_name.0 }}{{ payment.tenant.last_name.0 }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">{{ payment.tenant.full_name }}</div>
+                            <div style="font-size: 12px; color: var(--text-light);">{{ payment.tenant.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span style="background: var(--light-bg); padding: 8px 16px; border-radius: 20px; font-weight: 600;">
+                        {{ payment.tenant.unit.unit_number }}
+                    </span>
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-coins" style="color: var(--success-color);"></i>
+                        <span style="font-weight: 700; font-size: 16px; color: var(--success-color);">
+                            KES {{ payment.amount|floatformat:0 }}
+                        </span>
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <i class="fas fa-calendar" style="color: var(--text-light); font-size: 12px;"></i>
+                        {{ payment.payment_date|date:"M d, Y" }}
+                    </div>
+                </td>
+                <td>
+                    <span class="status status-paid">
+                        <i class="fas fa-{% if payment.payment_method == 'cash' %}money-bill{% elif payment.payment_method == 'mpesa' %}mobile-alt{% elif payment.payment_method == 'bank_transfer' %}university{% else %}file-invoice{% endif %}"></i>
+                        {{ payment.get_payment_method_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if payment.reference_number %}
+                        <span style="font-family: monospace; background: var(--light-bg); padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                            {{ payment.reference_number }}
+                        </span>
+                    {% else %}
+                        <span style="color: var(--text-light); font-style: italic;">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'view_payment' payment.id %}" class="btn-action btn-view tooltip" data-tooltip="View Receipt">
+                            <i class="fas fa-receipt"></i>
+                        </a>
+                        <a href="{% url 'edit_payment' payment.id %}" class="btn-action btn-edit tooltip" data-tooltip="Edit Payment">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'delete_payment' payment.id %}" class="btn-action btn-delete tooltip" data-tooltip="Delete Payment" onclick="return confirm('Are you sure you want to delete this payment record?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-light); padding: 60px;">
+            <i class="fas fa-credit-card" style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;"></i>
+            <div style="font-size: 18px; margin-bottom: 8px;">No payments recorded yet</div>
+            <a href="{% url 'add_payment' %}" class="btn btn-primary" style="margin-top: 16px;">
+              <i class="fas fa-plus"></i>
+              Record Your First Payment
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<script>
+function filterPayments(method) {
+    const rows = document.querySelectorAll('tbody tr[data-method]');
+    rows.forEach(row => {
+        if (!method || row.getAttribute('data-method') === method) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function filterByMonth(month) {
+    const rows = document.querySelectorAll('tbody tr[data-date]');
+    rows.forEach(row => {
+        if (!month || row.getAttribute('data-date') === month) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function sortPayments(sortBy) {
+    // This would typically be handled by the backend
+    // For now, we'll just reload the page with the sort parameter
+    const url = new URL(window.location);
+    url.searchParams.set('sort', sortBy);
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

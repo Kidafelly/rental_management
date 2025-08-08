@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - RentFlow{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .card {
+        background: white;
+        padding: 10px 14px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;         /* Horizontally center content */
+        justify-content: center;     /* Vertically center content */
+        text-align: center;          /* Center text for better visual alignment */
+    }
+
+
+    .card-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: #555;
+        text-align: center;
+    }
+
+
+    .card-value {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 2px;
+    }
+
+    .card-subtitle {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .progress-circle {
+    width: 65px;
+    height: 65px;
+    margin: 4px auto;
+    position: relative;
+}
+
+.progress-circle svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-circle-bg,
+.progress-circle-fill {
+    fill: none;
+    stroke-width: 6;
+}
+
+.progress-circle-bg {
+    stroke: #eee;
+}
+
+.progress-circle-fill {
+    stroke: var(--success-color, #28a745);
+    stroke-dasharray: 157;
+    stroke-dashoffset: calc(157 - (157 * {{ collection_percentage|floatformat:0 }}) / 100);
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-circle svg circle {
+    cx: 32.5;
+    cy: 32.5;
+    r: 25;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.block-scroll-container {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scroll-snap-type: x mandatory;
+    /* optional: smooth scrolling */
+    scroll-behavior: smooth;
+}
+
+/* Make the first-level block cards behave to show 3 on large screens */
+.block-scroll-container .block-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+    scroll-snap-align: start;
+    position: relative;
+}
+
+/* Metric grouping (already provided earlier) */
+.block-metrics {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.metric-box {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 8px 10px;
+    flex: 1 1 0;
+    min-width: 60px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.metric-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+}
+
+.metric-label {
+    font-size: 10px;
+    color: #666;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Large screen: show three cards side by side before needing to scroll */
+@media (min-width: 1024px) {
+    .block-scroll-container .block-card {
+        flex: 0 0 calc((100% - 32px) / 3); /* three cards with 16px gap between */
+        max-width: calc((100% - 32px) / 3);
+    }
+}
+
+.block-scroll-container {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    margin-bottom: 24px; 
+}
+
+
+</style>
+
+
+
+<div class="header">
+    <h1 class="page-title">Dashboard</h1>
+    <div class="header-actions">
+        <a href="{% url 'add_tenant' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i>
+            Add Tenant
+        </a>
+        <a href="{% url 'add_unit' %}" class="btn btn-secondary">
+            <i class="fas fa-plus"></i>
+            Add Unit
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <h3 class="card-title"><i class="fas fa-users"></i> Total Tenants</h3>
+        <div class="card-value">{{ total_tenants }}</div>
+        <div class="card-subtitle">Active tenants</div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title"><i class="fas fa-building"></i> Total Units</h3>
+        <div class="card-value">{{ total_units }}</div>
+        <div class="card-subtitle">{{ occupied_units }} occupied, {{ vacant_units }} vacant</div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title"><i class="fas fa-chart-pie"></i> Monthly Rent Collection</h3>
+        <div class="progress-circle">
+            <svg>
+                <circle class="progress-circle-bg" cx="60" cy="60" r="45"></circle>
+                <circle class="progress-circle-fill" cx="60" cy="60" r="45"></circle>
+            </svg>
+            <div class="progress-text">{{ collection_percentage }}%</div>
+        </div>
+        <div style="text-align: center;">
+            <div class="card-value">KES {{ payments_this_month|floatformat:0 }}</div>
+            <div class="card-subtitle">of KES {{ total_expected_rent|floatformat:0 }} expected</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Unpaid Rent</h3>
+        <div class="card-value" style="color: var(--danger-color, #dc3545);">
+            KES {{ unpaid_rent|floatformat:0 }}
+        </div>
+        <div class="card-subtitle">{{ unpaid_tenants }} tenants behind</div>
+    </div>
+</div>
+
+<h2 style="margin-top: 20px;">Apartments Overview</h2>
+<div class="block-scroll-container">
+    {% for block in blocks %}
+    <div class="card block-card">
+        <h3 class="card-title"><i class="fas fa-layer-group"></i> {{ block.name }}</h3>
+        <div class="card-subtitle">{{ block.location }}</div>
+
+        <div class="block-metrics">
+            <div class="metric-box">
+                <div class="metric-value">{{ block.annotated_total_units }}</div>
+                <div class="metric-label">Units</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-value">{{ block.vacant_units }}</div>
+                <div class="metric-label">Vacant</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-value">{{ block.fully_paid_count }}</div>
+                <div class="metric-label">Paid</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-value">{{ block.tenants_count_display }}</div>
+                <div class="metric-label">Tenants</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-value">
+                    KES {{ block.total_rent|floatformat:0 }}
+                    <span style="font-size: 12px; color: #888;">/ KES {{ block.expected_rent|floatformat:0 }}</span>
+                </div>
+                <div class="metric-label">Rent Collected</div>
+            </div>
+
+            <div class="metric-box">
+                <div class="metric-value">{{ block.occupancy_percent }}%</div>
+                <div class="metric-label">Occupancy</div>
+            </div>
+            
+
+        </div>
+    </div>
+    {% empty %}
+    <div style="padding: 20px;">No blocks found.</div>
+    {% endfor %}
+</div>
+
+
+
+
+
+<div class="table-container">
+    <div class="table-header">
+        <h3 class="table-title">
+            <i class="fas fa-history"></i>
+            Recent Payments
+        </h3>
+        <a href="{% url 'payments_list' %}" class="btn btn-secondary">
+            <i class="fas fa-eye"></i>
+            View All
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Unit</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Method</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in recent_payments %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                {{ payment.tenant.first_name.0 }}{{ payment.tenant.last_name.0 }}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">{{ payment.tenant.full_name }}</div>
+                                <div style="font-size: 12px; color: var(--text-light);">{{ payment.tenant.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="background: var(--light-bg); padding: 4px 12px; border-radius: 20px; font-weight: 600;">
+                            {{ payment.tenant.unit.unit_number }}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="font-weight: 700; color: var(--success-color);">
+                            KES {{ payment.amount|floatformat:0 }}
+                        </span>
+                    </td>
+                    <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="status status-paid">
+                            {{ payment.get_payment_method_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'view_payment' payment.id %}" class="btn-action btn-view tooltip" data-tooltip="View Receipt">
+                                <i class="fas fa-receipt"></i>
+                            </a>
+                            <a href="{% url 'edit_payment' payment.id %}" class="btn-action btn-edit tooltip" data-tooltip="Edit Payment">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-light); padding: 40px;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <div>No payments recorded yet</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

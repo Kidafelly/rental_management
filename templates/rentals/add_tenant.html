@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Tenant - RentFlow{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-user-plus"></i>
+        Add New Tenant
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'tenants_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Tenants
+        </a>
+    </div>
+</div>
+
+<div class="form-container">
+    <form method="post" id="tenantForm">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user"></i>
+                    {{ form.first_name.label }}
+                </label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.first_name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user"></i>
+                    {{ form.last_name.label }}
+                </label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.last_name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-envelope"></i>
+                {{ form.email.label }}
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.email.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-phone"></i>
+                {{ form.phone_number.label }}
+            </label>
+            {{ form.phone_number }}
+            {% if form.phone_number.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.phone_number.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-building"></i>
+                {{ form.block.label }}
+            </label>
+            {{ form.block }}
+            {% if form.block.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.block.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-building"></i>
+                {{ form.unit.label }}
+            </label>
+            {{ form.unit }}
+            {% if form.unit.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.unit.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ form.lease_start_date.label }}
+                </label>
+                {{ form.lease_start_date }}
+                {% if form.lease_start_date.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.lease_start_date.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-check"></i>
+                    {{ form.lease_end_date.label }}
+                </label>
+                {{ form.lease_end_date }}
+                {% if form.lease_end_date.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.lease_end_date.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-money-bill-wave"></i>
+                {{ form.security_deposit.label }}
+            </label>
+            {{ form.security_deposit }}
+            {% if form.security_deposit.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.security_deposit.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 32px; justify-content: flex-end;">
+            <a href="{% url 'tenants_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i>
+                <span>Add Tenant</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('tenantForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('span');
+    const btnIcon = submitBtn.querySelector('i');
+    
+    btnText.textContent = 'Adding...';
+    btnIcon.className = 'fas fa-spinner fa-spin';
+    submitBtn.disabled = true;
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const blockSelect = document.getElementById('id_block');
+    const unitSelect = document.getElementById('id_unit');
+
+    blockSelect.addEventListener('change', function () {
+        const blockId = this.value;
+
+        // Clear existing unit options
+        unitSelect.innerHTML = '<option value="">Loading units...</option>';
+
+        if (blockId) {
+            fetch(`/ajax/get-units/?block_id=${blockId}`)
+                .then(response => response.json())
+                .then(data => {
+                    unitSelect.innerHTML = '<option value="">Select Unit</option>';
+                    data.forEach(unit => {
+                        const option = document.createElement('option');
+                        option.value = unit.id;
+                        option.textContent = unit.unit_number;
+                        unitSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching units:', error);
+                    unitSelect.innerHTML = '<option value="">Error loading units</option>';
+                });
+        } else {
+            unitSelect.innerHTML = '<option value="">Select Block First</option>';
+        }
+    });
+});
+</script>
+
+{% endblock %}

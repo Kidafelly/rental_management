@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Unit - RentFlow{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-plus"></i>
+        Add New Unit
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'units_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Units
+        </a>
+    </div>
+</div>
+
+<div class="form-container">
+    <form method="post" id="unitForm">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-building"></i>
+                    {{ form.block.label }}
+                </label>
+                {{ form.block }}
+                {% if form.block.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.block.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-hashtag"></i>
+                    {{ form.unit_number.label }}
+                </label>
+                {{ form.unit_number }}
+                {% if form.unit_number.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.unit_number.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-home"></i>
+                    {{ form.unit_type.label }}
+                </label>
+                {{ form.unit_type }}
+                {% if form.unit_type.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.unit_type.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-money-bill-wave"></i>
+                {{ form.rent_amount.label }}
+            </label>
+            {{ form.rent_amount }}
+            {% if form.rent_amount.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.rent_amount.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-align-left"></i>
+                {{ form.description.label }}
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.description.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 32px; justify-content: flex-end;">
+            <a href="{% url 'units_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i>
+                <span>Add Unit</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('unitForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('span');
+    const btnIcon = submitBtn.querySelector('i');
+    
+    btnText.textContent = 'Adding...';
+    btnIcon.className = 'fas fa-spinner fa-spin';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}

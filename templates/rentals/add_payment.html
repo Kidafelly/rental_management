@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Payment - RentFlow{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-plus"></i>
+        Record New Payment
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'payments_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Payments
+        </a>
+    </div>
+</div>
+
+<div class="form-container">
+    <form method="post" id="paymentForm">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-user"></i>
+                {{ form.tenant.label }}
+            </label>
+            {{ form.tenant }}
+            {% if form.tenant.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.tenant.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-money-bill-wave"></i>
+                    {{ form.amount.label }}
+                </label>
+                {{ form.amount }}
+                {% if form.amount.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.amount.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ form.payment_date.label }}
+                </label>
+                {{ form.payment_date }}
+                {% if form.payment_date.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.payment_date.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-credit-card"></i>
+                    {{ form.payment_method.label }}
+                </label>
+                {{ form.payment_method }}
+                {% if form.payment_method.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.payment_method.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-hashtag"></i>
+                    {{ form.reference_number.label }}
+                </label>
+                {{ form.reference_number }}
+                {% if form.reference_number.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.reference_number.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-sticky-note"></i>
+                {{ form.notes.label }}
+            </label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.notes.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 32px; justify-content: flex-end;">
+            <a href="{% url 'payments_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success" id="submitBtn">
+                <i class="fas fa-save"></i>
+                <span>Record Payment</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('span');
+    const btnIcon = submitBtn.querySelector('i');
+    
+    btnText.textContent = 'Recording...';
+    btnIcon.className = 'fas fa-spinner fa-spin';
+    submitBtn.disabled = true;
+});
+
+// Auto-fill today's date
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.querySelector('input[type="date"]');
+    if (dateInput && !dateInput.value) {
+        dateInput.value = today;
+    }
+});
+</script>
+{% endblock %}

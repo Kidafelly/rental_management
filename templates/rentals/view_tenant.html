@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tenant.full_name }} - Tenant Details{% endblock %}
+
+{% block content %}
+<style>
+    .responsive-grid.two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        margin-bottom: 32px;
+    }
+
+    .search-filter-bar form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .search-filter-bar .left-filters {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+
+    .search-filter-bar .right-summary {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        flex: 1;
+    }
+
+    .status {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-occupied {
+        background-color: #f0f9ff;
+        color: #0284c7;
+    }
+
+    .status-vacant {
+        background-color: #ecfdf5;
+        color: #059669;
+    }
+
+    @media (max-width: 768px) {
+        .responsive-grid.two-column {
+            grid-template-columns: 1fr;
+        }
+
+        .search-filter-bar form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-filter-bar .right-summary {
+            justify-content: flex-start;
+        }
+    }
+.wallet-summary-card .card-body {
+  padding-top: 24px;
+}
+
+.wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+}
+
+.wallet-item label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 4px;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .wallet-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+
+
+
+<!-- Wallet Summary -->
+<div class="card wallet-summary-card">
+  <div class="card-header bg-warning text-white">
+    <h5 class="card-title mb-0"><i class="fas fa-wallet"></i> Wallet Summary</h5>
+  </div>
+  <div class="card-body">
+    <div class="wallet-grid">
+      <div class="wallet-item">
+        <label>Payment Status</label>
+        <span class="status {{ status_class }}">
+        {{ payment_status }}
+        </span>
+      </div>
+      <div class="wallet-item">
+        <label>Monthly Rent</label>
+        <div>KES {{ tenant.unit.rent_amount|floatformat:0 }}</div>
+      </div>
+      <div class="wallet-item">
+        <label>Paid This Month</label>
+        <div style="color: var(--success-color); font-weight: 600;">
+          KES {{ wallet.paid|floatformat:0 }}
+        </div>
+      </div>
+      <div class="wallet-item">
+        <label>Balance Due</label>
+        <div style="color: red; font-weight: 700;">
+          KES {{ wallet.balance|floatformat:0 }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Tenant and Unit Information Cards -->
+<div class="responsive-grid two-column">
+    <!-- Tenant Information Card -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Tenant Information</h5>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; gap: 16px;">
+            <div>
+                <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Full Name</label>
+                <div style="font-size: 18px; font-weight: 600;">{{ tenant.full_name }}</div>
+            </div>
+            <div>
+                <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Email</label>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-envelope" style="color: var(--text-light);"></i>
+                    <a href="mailto:{{ tenant.email }}" style="color: var(--primary-color);">{{ tenant.email }}</a>
+                </div>
+            </div>
+            <div>
+                <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Phone</label>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-phone" style="color: var(--text-light);"></i>
+                    <a href="tel:{{ tenant.phone_number }}" style="color: var(--primary-color);">{{ tenant.phone_number }}</a>
+                </div>
+            </div>
+            
+        </div>
+        </div>
+    </div>
+
+    <!-- Unit Information Card -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">Unit Information</h5>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; gap: 16px;">
+            <div>
+                <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Unit Number</label>
+                <div style="font-size: 18px; font-weight: 600;">{{ tenant.unit.unit_number }}</div>
+            </div>
+            <div>
+                <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Unit Type</label>
+                <div>{{ tenant.unit.get_unit_type_display }}</div>
+            </div>
+            
+            <div>
+                <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Security Deposit</label>
+                <div style="font-weight: 600;">KES {{ tenant.security_deposit|floatformat:0 }}</div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Lease Information -->
+<div class="card" style="margin-bottom: 32px;">
+    <h3 class="card-title">
+        <i class="fas fa-calendar-alt"></i>
+        Lease Information
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px;">
+        <div>
+            <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Lease Start</label>
+            <div style="font-weight: 600;">{{ tenant.lease_start_date|date:"F d, Y" }}</div>
+        </div>
+        <div>
+            <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Lease End</label>
+            <div style="font-weight: 600;">{{ tenant.lease_end_date|date:"F d, Y" }}</div>
+        </div>
+        <div>
+            <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Total Paid</label>
+            <div style="font-size: 18px; font-weight: 700; color: var(--success-color);">
+                KES {{ total_paid|floatformat:0 }}
+            </div>
+        </div>
+        <div>
+            <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Last Payment</label>
+            <div style="font-weight: 600;">
+                {% if last_payment %}
+                    {{ last_payment.payment_date|date:"M d, Y" }}
+                {% else %}
+                    No payments yet
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment History -->
+<div class="table-container">
+    <div class="table-header">
+        <h3 class="table-title">
+            <i class="fas fa-history"></i>
+            Payment History
+        </h3>
+        <a href="{% url 'add_payment' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Add Payment
+        </a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Reference</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>
+                    <span style="font-weight: 700; color: var(--success-color);">
+                        KES {{ payment.amount|floatformat:0 }}
+                    </span>
+                </td>
+                <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                <td>
+                    <span class="status status-paid">
+                        {{ payment.get_payment_method_display }}
+                    </span>
+                </td>
+                <td>{{ payment.reference_number|default:"-" }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'view_payment' payment.id %}" class="btn-action btn-view tooltip" data-tooltip="View Details">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'edit_payment' payment.id %}" class="btn-action btn-edit tooltip" data-tooltip="Edit Payment">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-light); padding: 40px;">
+                    <i class="fas fa-credit-card" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <div>No payments recorded yet</div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

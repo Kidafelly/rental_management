@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ tenant.full_name }} - Tenant{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-edit"></i>
+        Edit {{ tenant.full_name }}
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'view_tenant' tenant.id %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Details
+        </a>
+        <a href="{% url 'delete_tenant' tenant.id %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i>
+            Delete Tenant
+        </a>
+    </div>
+</div>
+
+<div class="form-container">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user"></i>
+                    {{ form.first_name.label }}
+                </label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        {{ form.first_name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user"></i>
+                    {{ form.last_name.label }}
+                </label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        {{ form.last_name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-envelope"></i>
+                {{ form.email.label }}
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    {{ form.email.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-phone"></i>
+                {{ form.phone_number.label }}
+            </label>
+            {{ form.phone_number }}
+            {% if form.phone_number.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    {{ form.phone_number.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-building"></i>
+                {{ form.unit.label }}
+            </label>
+            {{ form.unit }}
+            {% if form.unit.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    {{ form.unit.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ form.lease_start_date.label }}
+                </label>
+                {{ form.lease_start_date }}
+                {% if form.lease_start_date.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        {{ form.lease_start_date.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-check"></i>
+                    {{ form.lease_end_date.label }}
+                </label>
+                {{ form.lease_end_date }}
+                {% if form.lease_end_date.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        {{ form.lease_end_date.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-money-bill-wave"></i>
+                {{ form.security_deposit.label }}
+            </label>
+            {{ form.security_deposit }}
+            {% if form.security_deposit.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    {{ form.security_deposit.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 32px; justify-content: flex-end;">
+            <a href="{% url 'view_tenant' tenant.id %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i>
+                Update Tenant
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

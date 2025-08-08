@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Payment - Confirmation{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title" style="color: var(--danger-color);">
+        <i class="fas fa-exclamation-triangle"></i>
+        Delete Payment
+    </h1>
+</div>
+
+<div class="form-container" style="border: 2px solid var(--danger-color);">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <i class="fas fa-credit-card" style="font-size: 64px; color: var(--danger-color); margin-bottom: 16px;"></i>
+        <h2 style="color: var(--danger-color); margin-bottom: 16px;">Are you sure?</h2>
+        <p style="font-size: 16px; color: var(--text-light);">
+            You are about to delete this payment record.
+        </p>
+        <p style="font-size: 14px; color: var(--danger-color); margin-top: 8px;">
+            <i class="fas fa-exclamation-circle"></i>
+            This action cannot be undone!
+        </p>
+    </div>
+
+    <div style="background: var(--light-bg); padding: 24px; border-radius: 12px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px; color: var(--text-dark);">
+            <i class="fas fa-info-circle"></i>
+            Payment Details
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+                <strong>Tenant:</strong> {{ payment.tenant.full_name }}
+            </div>
+            <div>
+                <strong>Unit:</strong> {{ payment.tenant.unit.unit_number }}
+            </div>
+            <div>
+                <strong>Amount:</strong> KES {{ payment.amount|floatformat:0 }}
+            </div>
+            <div>
+                <strong>Date:</strong> {{ payment.payment_date|date:"M d, Y" }}
+            </div>
+            <div>
+                <strong>Method:</strong> {{ payment.get_payment_method_display }}
+            </div>
+            <div>
+                <strong>Reference:</strong> {{ payment.reference_number|default:"-" }}
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="{% url 'view_payment' payment.id %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i>
+                Yes, Delete Payment
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

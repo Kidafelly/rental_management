@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Block - RentFlow{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-building"></i>
+        Add New Block
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'blocks_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Blocks
+        </a>
+    </div>
+</div>
+
+<div class="form-container">
+    <form method="post" id="blockForm">
+        {% csrf_token %}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-signature"></i>
+                    {{ form.name.label }}
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.name.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-layer-group"></i>
+                    {{ form.total_units.label }}
+                </label>
+                {{ form.total_units }}
+                {% if form.total_units.errors %}
+                    <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.total_units.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ form.location.label }}
+            </label>
+            {{ form.location }}
+            {% if form.location.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.location.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-user-tie"></i>
+                {{ form.manager.label }}
+                <small style="color: var(--text-light); font-weight: normal;">(optional)</small>
+            </label>
+            {{ form.manager }}
+            {% if form.manager.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.manager.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-align-left"></i>
+                {{ form.description.label }}
+                <small style="color: var(--text-light); font-weight: normal;">(optional)</small>
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <div style="color: var(--danger-color); font-size: 12px; margin-top: 4px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.description.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-top: 32px; justify-content: flex-end;">
+            <a href="{% url 'blocks_list' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i>
+                <span>Add Block</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('blockForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('span');
+    const btnIcon = submitBtn.querySelector('i');
+
+    btnText.textContent = 'Saving...';
+    btnIcon.className = 'fas fa-spinner fa-spin';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}

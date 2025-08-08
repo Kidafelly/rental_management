@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Receipt - {{ payment.tenant.full_name }}{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-receipt"></i>
+        Payment Receipt
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'edit_payment' payment.id %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i>
+            Edit Payment
+        </a>
+        <a href="{% url 'payments_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Payments
+        </a>
+        <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print"></i>
+            Print Receipt
+        </button>
+    </div>
+</div>
+
+<div class="form-container" style="max-width: 800px;">
+    <!-- Receipt Header -->
+    <div style="text-align: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 24px; margin-bottom: 32px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px;">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                <i class="fas fa-home"></i>
+            </div>
+            <div>
+                <h2 style="margin: 0; color: var(--primary-color);">RentFlow</h2>
+                <p style="margin: 0; color: var(--text-light);">Rental Management System</p>
+            </div>
+        </div>
+        <h3 style="color: var(--text-dark); margin: 0;">PAYMENT RECEIPT</h3>
+        <p style="color: var(--text-light); margin: 8px 0 0 0;">Receipt #{{ payment.id|stringformat:"04d" }}</p>
+    </div>
+
+    <!-- Payment Details -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px;">
+        <!-- Tenant Information -->
+        <div>
+            <h4 style="color: var(--text-dark); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); pb: 8px;">
+                <i class="fas fa-user"></i>
+                Tenant Information
+            </h4>
+            <div style="display: grid; gap: 12px;">
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Name</label>
+                    <div style="font-weight: 600;">{{ payment.tenant.full_name }}</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Unit</label>
+                    <div style="font-weight: 600;">{{ payment.tenant.unit.unit_number }}</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Email</label>
+                    <div>{{ payment.tenant.email }}</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Phone</label>
+                    <div>{{ payment.tenant.phone_number }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div>
+            <h4 style="color: var(--text-dark); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); pb: 8px;">
+                <i class="fas fa-credit-card"></i>
+                Payment Information
+            </h4>
+            <div style="display: grid; gap: 12px;">
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Amount</label>
+                    <div style="font-size: 24px; font-weight: 700; color: var(--success-color);">
+                        KES {{ payment.amount|floatformat:0 }}
+                    </div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Date</label>
+                    <div style="font-weight: 600;">{{ payment.payment_date|date:"F d, Y" }}</div>
+                </div>
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Method</label>
+                    <div style="font-weight: 600;">{{ payment.get_payment_method_display }}</div>
+                </div>
+                {% if payment.reference_number %}
+                <div>
+                    <label style="font-weight: 600; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Reference</label>
+                    <div style="font-family: monospace; background: var(--light-bg); padding: 8px; border-radius: 4px;">
+                        {{ payment.reference_number }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Section -->
+    {% if payment.notes %}
+    <div style="margin-bottom: 32px;">
+        <h4 style="color: var(--text-dark); margin-bottom: 16px;">
+            <i class="fas fa-sticky-note"></i>
+            Notes
+        </h4>
+        <div style="background: var(--light-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+            {{ payment.notes }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Summary -->
+    <div style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; padding: 24px; border-radius: 12px; text-align: center;">
+        <h3 style="margin: 0 0 8px 0;">Payment Confirmed</h3>
+        <p style="margin: 0; opacity: 0.9;">Thank you for your payment!</p>
+        <div style="margin-top: 16px; font-size: 12px; opacity: 0.8;">
+            Processed on {{ payment.created_at|date:"F d, Y \a\t g:i A" }}
+        </div>
+    </div>
+</div>
+
+<style media="print">
+    .header, .sidebar, .btn { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .form-container { box-shadow: none !important; border: 1px solid #000 !important; }
+</style>
+{% endblock %}

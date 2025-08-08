@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Unit {{ unit.unit_number }} - Details{% endblock %}
+
+{% block content %}
+
+
+<style>
+    .responsive-grid.two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        margin-bottom: 32px;
+    }
+
+    .status {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-occupied {
+        background-color: #f0f9ff;
+        color: #0284c7;
+    }
+
+    .status-vacant {
+        background-color: #ecfdf5;
+        color: #059669;
+    }
+
+    .status-maintenance {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+
+    @media (max-width: 768px) {
+        .responsive-grid.two-column {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="header">
+    <h1 class="page-title">
+        <i class="fas fa-building"></i>
+        Unit {{ unit.unit_number }}
+    </h1>
+    <div class="header-actions">
+        <a href="{% url 'edit_unit' unit.id %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i>
+            Edit Unit
+        </a>
+        <a href="{% url 'units_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Units
+        </a>
+    </div>
+</div>
+
+<div class="responsive-grid two-column">
+    <!-- Unit Information -->
+    <div class="card">
+        <h3 class="card-title">
+            <i class="fas fa-info-circle"></i>
+            Unit Information
+        </h3>
+        <div style="display: grid; gap: 20px;">
+            <div>
+                <label class="text-label">Unit Number</label>
+                <div class="text-xl font-bold">{{ unit.unit_number }}</div>
+            </div>
+            <div>
+                <label class="text-label">Block</label>
+                <div class="font-semibold text-lg">
+                    {{ unit.block.name }}
+                </div>
+            </div>
+
+            <div>
+                <label class="text-label">Unit Type</label>
+                <div class="font-semibold text-lg">{{ unit.get_unit_type_display }}</div>
+            </div>
+            <div>
+                <label class="text-label">Monthly Rent</label>
+                <div class="text-xl font-bold" style="color: var(--success-color);">
+                    KES {{ unit.rent_amount|floatformat:0 }}
+                </div>
+            </div>
+            <div>
+                <label class="text-label">Status</label>
+                <span class="status status-{{ unit.status }}">
+                    <i class="fas fa-{% if unit.status == 'occupied' %}check{% elif unit.status == 'vacant' %}door-open{% else %}tools{% endif %}"></i>
+                    {{ unit.get_status_display }}
+                </span>
+            </div>
+            {% if unit.description %}
+            <div>
+                <label class="text-label">Description</label>
+                <div style="line-height: 1.6;">{{ unit.description }}</div>
+            </div>
+            {% endif %}
+            <div>
+                <label class="text-label">Created</label>
+                <div>{{ unit.created_at|date:"F d, Y" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenant Information -->
+    <div class="card">
+        <h3 class="card-title">
+            <i class="fas fa-user"></i>
+            Current Tenant
+        </h3>
+        {% if unit.tenant %}
+            <div style="display: grid; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px;">
+                        {{ unit.tenant.first_name.0 }}{{ unit.tenant.last_name.0 }}
+                    </div>
+                    <div>
+                        <div class="font-bold text-lg">{{ unit.tenant.full_name }}</div>
+                        <div style="color: var(--text-light);">{{ unit.tenant.email }}</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-label">Phone</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-phone" style="color: var(--text-light);"></i>
+                        <a href="tel:{{ unit.tenant.phone_number }}" style="color: var(--primary-color);">{{ unit.tenant.phone_number }}</a>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-label">Lease Period</label>
+                    <div>{{ unit.tenant.lease_start_date|date:"M d, Y" }} – {{ unit.tenant.lease_end_date|date:"M d, Y" }}</div>
+                </div>
+                <div>
+                    <label class="text-label">Payment Status</label>
+                    <span class="status status-{{ unit.tenant.payment_status }}">
+                        {{ unit.tenant.get_payment_status_display }}
+                    </span>
+                </div>
+                <div style="margin-top: 16px;">
+                    <a href="{% url 'view_tenant' unit.tenant.id %}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i>
+                        View Tenant Details
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 40px; color: var(--text-light);">
+                <i class="fas fa-user-slash" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                <div style="font-size: 16px; margin-bottom: 16px;">No tenant assigned</div>
+                <a href="{% url 'add_tenant' %}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    Assign Tenant
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

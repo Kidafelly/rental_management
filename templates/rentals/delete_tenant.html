@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ tenant.full_name }} - Confirmation{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1 class="page-title" style="color: var(--danger-color);">
+        <i class="fas fa-exclamation-triangle"></i>
+        Delete Tenant
+    </h1>
+</div>
+
+<div class="form-container" style="border: 2px solid var(--danger-color);">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <i class="fas fa-user-times" style="font-size: 64px; color: var(--danger-color); margin-bottom: 16px;"></i>
+        <h2 style="color: var(--danger-color); margin-bottom: 16px;">Are you sure?</h2>
+        <p style="font-size: 16px; color: var(--text-light);">
+            You are about to delete <strong>{{ tenant.full_name }}</strong> from unit <strong>{{ tenant.unit.unit_number }}</strong>.
+        </p>
+        <p style="font-size: 14px; color: var(--danger-color); margin-top: 8px;">
+            <i class="fas fa-exclamation-circle"></i>
+            This action cannot be undone!
+        </p>
+    </div>
+
+    <div style="background: var(--light-bg); padding: 24px; border-radius: 12px; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px; color: var(--text-dark);">
+            <i class="fas fa-info-circle"></i>
+            Tenant Details
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+                <strong>Name:</strong> {{ tenant.full_name }}
+            </div>
+            <div>
+                <strong>Unit:</strong> {{ tenant.unit.unit_number }}
+            </div>
+            <div>
+                <strong>Email:</strong> {{ tenant.email }}
+            </div>
+            <div>
+                <strong>Phone:</strong> {{ tenant.phone_number }}
+            </div>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="{% url 'view_tenant' tenant.id %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i>
+                Yes, Delete Tenant
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
